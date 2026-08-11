@@ -260,6 +260,21 @@ function MusicPlayer({ isPlaying, onToggle }) {
 }
 
 /* ----------------------------------------------------------------------
+   THREE.JS MODULE CACHE — a single shared promise so every call to
+   `loadThree()` (the root warm-up on mount, and ThreeStage later)
+   reuses the exact same in-flight/resolved import instead of
+   triggering a second network fetch.
+------------------------------------------------------------------------- */
+
+let threeModulePromise = null;
+function loadThree() {
+  if (!threeModulePromise) {
+    threeModulePromise = import("three");
+  }
+  return threeModulePromise;
+}
+
+/* ----------------------------------------------------------------------
    3D STAGE — a small shared Three.js harness used by the gift box.
    Handles renderer/camera/lights/shadows/resize/drag-to-rotate/cleanup
    so the scene only has to build + animate its meshes.
@@ -301,13 +316,14 @@ function ThreeStage({
   refsRef,
 }) {
   const mountRef = useRef(null);
+  const [ready, setReady] = useState(false);
 
   useEffect(() => {
     let THREE;
     let renderer, scene, camera, raf, resizeObserver;
     let cancelled = false;
 
-    import("three").then((mod) => {
+    loadThree().then((mod) => {
       if (cancelled) return;
       THREE = mod;
       const mount = mountRef.current;
@@ -432,6 +448,8 @@ function ThreeStage({
         renderer.dispose();
         if (mount.contains(renderer.domElement)) mount.removeChild(renderer.domElement);
       };
+
+      setReady(true);
     });
 
     return () => {
@@ -441,7 +459,22 @@ function ThreeStage({
     };
   }, []); // eslint-disable-line
 
-  return <div ref={mountRef} style={{ width: "100%", height }} />;
+  return (
+    <div ref={mountRef} style={{ width: "100%", height, position: "relative" }}>
+      {!ready && (
+        <div
+          className="absolute inset-0 flex items-center justify-center"
+          style={{ pointerEvents: "none" }}
+        >
+          <Sparkles
+            size={30}
+            color={COLORS.gold}
+            style={{ animation: "spin 1.3s linear infinite", opacity: 0.8 }}
+          />
+        </div>
+      )}
+    </div>
+  );
 }
 
 /* ----------------------------------------------------------------------
@@ -511,6 +544,7 @@ function VideoScene({ onContinue, onStart, started }) {
           playsInline
           muted
           loop
+          preload="auto"
           controls={false}
           disablePictureInPicture
           onContextMenu={(e) => e.preventDefault()}
@@ -987,6 +1021,38 @@ export default function BirthdayExperience() {
   const [isPlaying, setIsPlaying] = useState(false);
   const containerRef = useRef(null);
   const audioRef = useRef(null);
+
+  // ---- Preload warm-ups: fire the moment the app mounts, so both the
+  // video file and the Three.js module (used by the gift box scene)
+  // are already downloading while the visitor is still watching the
+  // intro video / reading the intro text — instead of only starting
+  // once they click "Continue" and hit a blank/frozen gift box.
+  useEffect(() => {
+    // 1. Hint the browser to start fetching the video immediately.
+    const videoLink = document.createElement("link");
+    videoLink.rel = "preload";
+    videoLink.as = "video";
+    videoLink.href = VIDEO_SRC;
+    document.head.appendChild(videoLink);
+
+    // 2. Hint the browser to start fetching the song too, since it's
+    // needed as soon as the user taps play on the video.
+    const audioLink = document.createElement("link");
+    audioLink.rel = "preload";
+    audioLink.as = "audio";
+    audioLink.href = SONG_SRC;
+    document.head.appendChild(audioLink);
+
+    // 3. Kick off the Three.js module download early. ThreeStage calls
+    // the same loadThree() helper later, so it reuses this fetch
+    // instead of starting a fresh one when the gift box mounts.
+    loadThree();
+
+    return () => {
+      document.head.removeChild(videoLink);
+      document.head.removeChild(audioLink);
+    };
+  }, []);
 
   useEffect(() => {
     containerRef.current?.scrollTo({ top: 0, behavior: "smooth" });
