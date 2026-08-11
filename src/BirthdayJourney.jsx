@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState, useRef } from "react";
 import { Heart, Sparkles, ArrowRight, ArrowLeft, Music2, Pause, Play, Volume2, VolumeX } from "lucide-react";
-import { Bday } from "./assets/bday.mp4";
-import { Song } from "./assets/song.mp3";
+import Bday from "./bday.mp4";
+import Song from "./song.mp3";
 
 const BIRTHDAY_NAME = "Pallavi";
 const VIDEO_SRC = { Bday };
