@@ -65,6 +65,11 @@ const LETTERS = [
     message:
       "Keep smiling and shining, baby papa will always be here for you, through everything, always. ❤️",
   },
+  {
+    name: "Darling Rome",
+    message:
+      "Happy Birthday, my dearest Piyu! 🎂❤️ May your smile never fade, your heart always stay happy, and every dream you hold come true. 🎉🌹",
+  },
 ];
 
 const COLORS = {
