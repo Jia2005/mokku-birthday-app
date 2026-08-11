@@ -192,55 +192,15 @@ function ProgressDots({ step, onJump }) {
   );
 }
 
-function MusicPlayer() {
-  const audioRef = useRef(null);
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [needsTap, setNeedsTap] = useState(false);
+/* ----------------------------------------------------------------------
+   MUSIC PLAYER — now a "dumb" display component. The actual <audio>
+   element and playback state live in the root component so a single
+   button (the video's play overlay) can start both video + song
+   together as one real user gesture (required by browser autoplay
+   policies).
+------------------------------------------------------------------------- */
 
-  useEffect(() => {
-    const audio = audioRef.current;
-    if (!audio) return;
-
-    audio
-      .play()
-      .then(() => setIsPlaying(true))
-      .catch(() => {
-        setNeedsTap(true);
-        const startOnInteract = () => {
-          audio
-            .play()
-            .then(() => {
-              setIsPlaying(true);
-              setNeedsTap(false);
-            })
-            .catch(() => {});
-        };
-        window.addEventListener("pointerdown", startOnInteract, { once: true });
-        window.addEventListener("keydown", startOnInteract, { once: true });
-        return () => {
-          window.removeEventListener("pointerdown", startOnInteract);
-          window.removeEventListener("keydown", startOnInteract);
-        };
-      });
-  }, []);
-
-  const toggle = () => {
-    const audio = audioRef.current;
-    if (!audio) return;
-    if (isPlaying) {
-      audio.pause();
-      setIsPlaying(false);
-    } else {
-      audio
-        .play()
-        .then(() => {
-          setIsPlaying(true);
-          setNeedsTap(false);
-        })
-        .catch(() => {});
-    }
-  };
-
+function MusicPlayer({ isPlaying, onToggle }) {
   return (
     <div
       className="fixed bottom-5 left-4 sm:left-5 z-50 flex items-center gap-2 pr-4 pl-2.5 py-2 rounded-full"
@@ -252,10 +212,8 @@ function MusicPlayer() {
         maxWidth: 190,
       }}
     >
-      <audio ref={audioRef} src={SONG_SRC} loop preload="auto" />
-
       <button
-        onClick={toggle}
+        onClick={onToggle}
         aria-label={isPlaying ? "Pause music" : "Play music"}
         className="shrink-0 flex items-center justify-center rounded-full"
         style={{
@@ -284,7 +242,7 @@ function MusicPlayer() {
           <span className="truncate">{SONG_TITLE}</span>
         </span>
         <span style={{ color: COLORS.inkSoft, fontFamily: "Quicksand, sans-serif", fontSize: 10.5 }}>
-          {needsTap ? "tap anywhere to play" : isPlaying ? "now playing" : "paused"}
+          {isPlaying ? "now playing" : "paused"}
         </span>
       </div>
     </div>
@@ -477,22 +435,32 @@ function ThreeStage({
 }
 
 /* ----------------------------------------------------------------------
-   SCENE 1 — the video (silent — the music player carries all audio)
+   SCENE 1 — the video.
+   Shows a play button overlay before playback starts. Clicking it
+   plays the video AND signals the root component to start the song —
+   both fire from the same real click, so browser autoplay policies
+   allow both without any extra taps.
 ------------------------------------------------------------------------- */
 
-function VideoScene({ onContinue }) {
+function VideoScene({ onContinue, onStart, started }) {
   const cta = useStaggeredReveal([600])[0];
   const videoRef = useRef(null);
 
   useEffect(() => {
     const v = videoRef.current;
     if (!v) return;
-    // Force silent playback — the background song is the only audio
-    // source, so the video itself is always muted regardless of source.
+    // The video itself is always muted — the background song is the
+    // only audio source.
     v.muted = true;
     v.volume = 0;
-    v.play().catch(() => {});
   }, []);
+
+  const handleStart = () => {
+    if (started) return;
+    const v = videoRef.current;
+    if (v) v.play().catch(() => {});
+    onStart();
+  };
 
   return (
     <div className="relative flex flex-col items-center justify-center min-h-screen px-6 py-14 overflow-hidden">
@@ -532,13 +500,34 @@ function VideoScene({ onContinue }) {
           src={VIDEO_SRC}
           playsInline
           muted
-          autoPlay
           loop
           controls={false}
           disablePictureInPicture
           onContextMenu={(e) => e.preventDefault()}
           style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
         />
+
+        {!started && (
+          <button
+            onClick={handleStart}
+            aria-label="Play video and music"
+            className="absolute inset-0 flex items-center justify-center"
+            style={{ background: "rgba(0,0,0,0.35)", cursor: "pointer" }}
+          >
+            <span
+              className="flex items-center justify-center rounded-full"
+              style={{
+                width: 78,
+                height: 78,
+                background: `linear-gradient(135deg, ${COLORS.roseDeep}, ${COLORS.rose})`,
+                boxShadow: "0 10px 30px rgba(242,67,109,0.45)",
+                animation: "pulse 1.8s ease-in-out infinite",
+              }}
+            >
+              <Play size={30} color="#fff" fill="#fff" style={{ marginLeft: 4 }} />
+            </span>
+          </button>
+        )}
       </div>
 
       <button
@@ -992,17 +981,59 @@ function ClosingScene({ onRestart }) {
 
 /* ----------------------------------------------------------------------
    ROOT
+   Owns the single shared <audio> element + playback state, so the
+   video's play-button overlay can start the song and the video with
+   one real click (satisfies browser autoplay policy).
 ------------------------------------------------------------------------- */
 
 export default function BirthdayExperience() {
   const [step, setStep] = useState(0);
+  const [started, setStarted] = useState(false);
+  const [isPlaying, setIsPlaying] = useState(false);
   const containerRef = useRef(null);
+  const audioRef = useRef(null);
 
   useEffect(() => {
     containerRef.current?.scrollTo({ top: 0, behavior: "smooth" });
   }, [step]);
 
   const goTo = (i) => setStep(Math.max(0, Math.min(STEPS.length - 1, i)));
+
+  const handleStart = () => {
+    setStarted(true);
+    const audio = audioRef.current;
+    if (audio) {
+      audio
+        .play()
+        .then(() => setIsPlaying(true))
+        .catch(() => {});
+    }
+  };
+
+  const toggleMusic = () => {
+    const audio = audioRef.current;
+    if (!audio) return;
+    if (isPlaying) {
+      audio.pause();
+      setIsPlaying(false);
+    } else {
+      audio
+        .play()
+        .then(() => setIsPlaying(true))
+        .catch(() => {});
+    }
+  };
+
+  const handleRestart = () => {
+    goTo(0);
+    setStarted(false);
+    const audio = audioRef.current;
+    if (audio) {
+      audio.pause();
+      audio.currentTime = 0;
+      setIsPlaying(false);
+    }
+  };
 
   return (
     <div
@@ -1015,6 +1046,8 @@ export default function BirthdayExperience() {
         fontFamily: "Quicksand, sans-serif",
       }}
     >
+      <audio ref={audioRef} src={SONG_SRC} loop preload="auto" />
+
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Quicksand:wght@400;500;600;700&display=swap');
 
@@ -1050,14 +1083,14 @@ export default function BirthdayExperience() {
         }
       `}</style>
 
-      {step === 0 && <VideoScene onContinue={() => goTo(1)} />}
+      {step === 0 && <VideoScene onContinue={() => goTo(1)} onStart={handleStart} started={started} />}
       {step === 1 && <GiftScene onContinue={() => goTo(2)} />}
       {step === 2 && <CardScene onContinue={() => goTo(3)} />}
       {step === 3 && <LettersScene onContinue={() => goTo(4)} />}
-      {step === 4 && <ClosingScene onRestart={() => goTo(0)} />}
+      {step === 4 && <ClosingScene onRestart={handleRestart} />}
 
       <ProgressDots step={step} onJump={goTo} />
-      <MusicPlayer />
+      <MusicPlayer isPlaying={isPlaying} onToggle={toggleMusic} />
     </div>
   );
 }
