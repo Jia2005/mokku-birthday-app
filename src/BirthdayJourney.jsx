@@ -11,7 +11,7 @@ const SONG_TITLE = "Love you Mokku";
 const CARD_MESSAGE = {
   heading: "Happy Birthday!",
   body:
-    "Surprise! I wanted to make something as one-of-a-kind as you are. Today isn't just about cake and candles — it's about celebrating the exact day the world got a little brighter, a little louder, and a lot more fun.",
+    "Surprise! I wanted to make something as one-of-a-kind as you are. Today isn't just about cake and candles, it's about celebrating the day the world got a little brighter, a little louder and a lot more fun, cause of ANGEL like you 😘😘.",
 };
 
 const LETTERS = [
@@ -51,9 +51,9 @@ const LETTERS = [
       "Many many happy returns of the day bacha (aka grannie). Enjoy ur day to the fullest and may all ur dreams come true. Love you 💖",
   },
   {
-    name: "Person 8",
+    name: "Boomieeee",
     message:
-      "Nam libero tempore, cum soluta nobis est eligendi optio. Here's to more laughs, memories, and cake together.",
+      "Happy birthday mummaa..... stay happy and healthy always ur the best mother I got....I really love u as my mother... enjoy ur day and be happy forever 💝🫂🫶🏻",
   },
 ];
 
@@ -77,8 +77,8 @@ const STEPS = ["video", "gift", "card", "letters", "closing"];
 const CLOSING_MESSAGE = {
   heading: "One Last Thing...",
   body:
-    "I hope today feels exactly as special as you are — full of laughter, love, and a little bit of magic. Here's to another year of chasing big dreams and small joys. And here's to many, many more birthdays where we get to celebrate you, together.",
-  signoff: "With all my love,",
+    "I hope today feels exactly as special as you are. Full of laughter, love and a little bit of magic. Here's to another year of chasing big dreams and small joys. Here's to many, many more birthdays where we get to celebrate you, together🫂🫂",
+  signoff: "With all my love 💕💕",
 };
 
 function useStaggeredReveal(delays) {
@@ -756,10 +756,6 @@ function GiftScene({ onContinue }) {
   );
 }
 
-/* ----------------------------------------------------------------------
-   SCENE 3 — the card
-------------------------------------------------------------------------- */
-
 function CardScene({ onContinue }) {
   const reveal = useStaggeredReveal([100]);
   return (
@@ -920,10 +916,6 @@ function LettersScene({ onContinue }) {
   );
 }
 
-/* ----------------------------------------------------------------------
-   SCENE 5 — closing message + restart
-------------------------------------------------------------------------- */
-
 function ClosingScene({ onRestart }) {
   const reveal = useStaggeredReveal([100]);
   return (
@@ -978,13 +970,6 @@ function ClosingScene({ onRestart }) {
     </div>
   );
 }
-
-/* ----------------------------------------------------------------------
-   ROOT
-   Owns the single shared <audio> element + playback state, so the
-   video's play-button overlay can start the song and the video with
-   one real click (satisfies browser autoplay policy).
-------------------------------------------------------------------------- */
 
 export default function BirthdayExperience() {
   const [step, setStep] = useState(0);
