@@ -4,8 +4,8 @@ import Bday from "./bday.mp4";
 import Song from "./song.mp3";
 
 const BIRTHDAY_NAME = "Pallavi";
-const VIDEO_SRC = { Bday };
-const SONG_SRC = { Song };
+const VIDEO_SRC = Bday;
+const SONG_SRC = Song;
 const SONG_TITLE = "Love you Mokku";
 
 const CARD_MESSAGE = {
