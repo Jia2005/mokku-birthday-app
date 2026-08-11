@@ -55,6 +55,16 @@ const LETTERS = [
     message:
       "Happy birthday mummaa..... stay happy and healthy always ur the best mother I got....I really love u as my mother... enjoy ur day and be happy forever 💝🫂🫶🏻",
   },
+  {
+    name: "Wesluu",
+    message:
+      "Happy birthday mumma hope you have the best day ever love you so is much thank you so much for making me part of your life 💖💖",
+  },
+  {
+    name: "Paa Wolfe",
+    message:
+      "Keep smiling and shining, baby papa will always be here for you, through everything, always. ❤️",
+  },
 ];
 
 const COLORS = {
