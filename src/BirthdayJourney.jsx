@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Play, Pause, Volume2, Sparkles, Heart } from 'lucide-react';
 import confetti from 'canvas-confetti';
 
-export default function BirthdayJourney() {
+export default function MummaBirthday() {
   // Navigation & Page State
   const [currentPage, setCurrentPage] = useState('page-0');
 
@@ -237,7 +237,7 @@ export default function BirthdayJourney() {
                 <video
                   controls
                   className="w-full h-auto rounded-2xl border border-pink-100 shadow-inner bg-pink-50 object-cover max-h-[420px]"
-                  poster="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='100%' height='100%' viewBox='0 0 10 What do you mean, put down it?0 100'><rect width='100' height='100' fill='%23FFF0F3'/><text x='50%' y='50%' dominant-baseline='middle' text-anchor='middle' font-family='sans-serif' font-size='6' fill='%23E8A5B8'>▶ Click to watch our memories 🎂</text></svg>"
+                  poster="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='100%' height='100%' viewBox='0 0 100 100'><rect width='100' height='100' fill='%23FFF0F3'/><text x='50%' y='50%' dominant-baseline='middle' text-anchor='middle' font-family='sans-serif' font-size='6' fill='%23E8A5B8'>▶ Click to watch our memories 🎂</text></svg>"
                 >
                   <source src="src\birthday.mp4" type="video/mp4" />
                   Your browser does not support the video tag.
