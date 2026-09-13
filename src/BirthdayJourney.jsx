@@ -316,7 +316,7 @@ export default function MummaBirthday() {
                 “How do we talk THIS much??” 😭
               </p>
               <p className="text-sm sm:text-base leading-relaxed text-gray-700">
-                Our ‘little calls’ are never actually little. Somehow we can spend hours and hours talking about absolutely everything — random things, serious things, things that make absolutely no sense whatsoever — and just when we think we've run out of things to say, we somehow find another 47 topics. 😭
+                Our ‘little calls’ are never actually little. Somehow we can spend hours and hours talking about absolutely everything — random things, serious things, things that make absolutely no sense whatsoever and just when we think we've run out of things to say, we somehow find another 47 topics. 😭
               </p>
               <p className="text-sm sm:text-base leading-relaxed text-gray-700">
                 And honestly, I think that's one of my favourite things about us. We never really run out of conversation.
@@ -464,7 +464,7 @@ export default function MummaBirthday() {
                     sometimes I genuinely think about how funny it is that we were literally two strangers once. Like… how did we go from not knowing each other at all to somehow becoming people who can't imagine going a whole day without talking to each other? 😭
                   </p>
                   <p>
-                    Somewhere along the way, you just became such a normal and important part of my everyday life that not talking to you feels weird now. Our little calls are obviously never little — we can spend hours talking to each other and still somehow have another hundred things to say. And honestly, I don't think I'll ever get tired of that.
+                    Somewhere along the way, you just became such a normal and important part of my everyday life that not talking to you feels weird now. Our little calls are obviously never little. We can spend hours talking to each other and still somehow have another hundred things to say. And honestly, I don't think I'll ever get tired of that.
                   </p>
                   <p>
                     I wish we could meet more often. I wish we could just randomly decide to meet, sit together, talk for hours in person, annoy each other and then go home after probably still having ten more things to say. I miss you more than I probably say, and I really, really want the day when we can actually meet and make all these silly little memories in person. 🥹
